@@ -1,0 +1,19 @@
+{
+  "name": "application-blockchain-sertifikat",
+  "version": "1.0.0",
+  "description": "Aplikasi untuk penerbitan sertifikat ",
+  "main": "index.js",
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo\"Error: no test specified\" && exit 1"
+  },
+  "author": "Hamam",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "dotenv": "^16.4.7",
+    "lite-server": "^2.6.1",
+    "truffle-contract": "4.0.31",
+    "web3": "^4.16.0"
+  }
+}
