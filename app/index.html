@@ -3,111 +3,95 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blockchain Sertifikat</title>
+    <title>Aplikasi Sertifikat Blockchain</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <style>
       body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f9;
-        color: #333;
-        margin: 0;
-        padding: 0;
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       }
-
-      header {
-        background-color: #007bff;
-        color: white;
-        text-align: center;
-        padding: 20px 0;
-      }
-
-      h2 {
-        margin: 0;
-        font-size: 24px;
-      }
-
       .container {
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
       }
-
-      .container label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
+      h2 {
+        text-align: center;
+        color: #007bff;
+      }
+      .form-group label {
         font-weight: bold;
       }
-
-      .container input {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
       }
-
-      .container button {
-        padding: 10px 20px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        width: 100%;
+      .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
       }
-
-      .container button:hover {
-        background-color: #218838;
+      .form-control {
+        border-radius: 5px;
       }
-
-      .container #certificateResult {
+      #sertifikatBaru {
+        background-color: #f1f1f1;
+        border-radius: 10px;
+        padding: 20px;
         margin-top: 20px;
-        padding: 15px;
-        background-color: #e9f7e9;
-        border: 1px solid #28a745;
-        border-radius: 4px;
       }
-
-      #adminAddress {
-        font-size: 16px;
-        margin-bottom: 20px;
-        color: #555;
+      #sertifikatBaru p {
+        font-size: 1.1rem;
       }
-
-      #resultMessage {
-        font-size: 16px;
-        color: #333;
+      .alert {
+        margin-top: 20px;
+        font-size: 1.2rem;
+      }
+      @media (max-width: 576px) {
+        .container {
+          padding: 20px;
+        }
+        h2 {
+          font-size: 1.5rem;
+        }
       }
     </style>
   </head>
   <body>
-    <header>
-      <h2>Pengajuan Sertifikat Blockchain</h2>
-    </header>
+    <div class="container mt-5">
+      <h2>Aplikasi Sertifikat Blockchain</h2>
 
-    <div class="container">
-      <p id="adminAddress">Admin: Loading...</p>
+      <!-- Form untuk memasukkan data sertifikat -->
+      <form id="formSertifikat">
+        <div class="form-group">
+          <label for="penerima">Penerima:</label>
+          <input type="text" class="form-control" id="penerima" placeholder="Masukkan alamat penerima" required />
+        </div>
+        <div class="form-group">
+          <label for="nama">Nama Sertifikat:</label>
+          <input type="text" class="form-control" id="nama" placeholder="Masukkan nama sertifikat" required />
+        </div>
+        <div class="form-group">
+          <label for="kursus">Kursus:</label>
+          <input type="text" class="form-control" id="kursus" placeholder="Masukkan nama kursus" required />
+        </div>
+        <div class="form-group">
+          <label for="institusi">Institusi:</label>
+          <input type="text" class="form-control" id="institusi" placeholder="Masukkan nama institusi" required />
+        </div>
+        <div class="form-group">
+          <label for="tanggal">Tanggal:</label>
+          <input type="date" class="form-control" id="tanggal" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Terbitkan Sertifikat</button>
+      </form>
+      <hr />
 
-      <label for="nama">Nama:</label>
-      <input type="text" id="nama" placeholder="Masukkan Nama" /><br /><br />
+      <!-- Menampilkan sertifikat yang baru diterbitkan -->
+      <div id="sertifikatBaru" class="mt-4"></div>
 
-      <label for="kursus">Sertifikat Yang Diambil:</label>
-      <input type="text" id="kursus" placeholder="Masukkan Sertifikat" /><br /><br />
-
-      <button onclick="ajukanPermintaanSertifikat()">Ajukan Sertifikat</button>
-
-      <div id="certificateResult" style="display: none">
-        <h3>Hasil:</h3>
-        <p id="resultMessage"></p>
-      </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js"></script>
+    <!-- Script untuk menghubungkan Web3 dan interaksi dengan smart contract -->
     <script src="app.js"></script>
   </body>
 </html>

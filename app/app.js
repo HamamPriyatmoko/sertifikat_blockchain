@@ -1,26 +1,7 @@
-// Inisialisasi Web3 dengan deteksi MetaMask
-async function initWeb3() {
-  if (typeof window.ethereum !== 'undefined') {
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      window.web3 = new Web3(window.ethereum);
-      console.log('✅ Web3 connected!');
-      return new Web3(window.ethereum);
-    } catch (error) {
-      console.error('🚨 User denied account access:', error);
-      alert('⚠️ Mohon izinkan akses MetaMask!');
-    }
-  } else {
-    console.error('🚨 Web3 not detected! Please install MetaMask.');
-    alert('❌ MetaMask tidak terdeteksi! Install dan login terlebih dahulu.');
-  }
-  return null;
-}
-
-// Kontrak ABI dan alamat
-const contractAddress = '0x22358434d0B3bd65CA463f048981680cD770A31e';
-
-const contractAbi = [
+let web3;
+let contract;
+const contractAddress = '0x0d7Be2d770066FBfEb66d679035A403AE85c2F3E'; // Ganti dengan alamat smart contract Anda
+const contractABI = [
   {
     inputs: [],
     stateMutability: 'nonpayable',
@@ -29,10 +10,42 @@ const contractAbi = [
   {
     anonymous: false,
     inputs: [
-      { indexed: false, internalType: 'uint256', name: 'id', type: 'uint256' },
-      { indexed: false, internalType: 'address', name: 'penerima', type: 'address' },
-      { indexed: false, internalType: 'string', name: 'nama', type: 'string' },
-      { indexed: false, internalType: 'string', name: 'kursus', type: 'string' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'penerima',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'nama',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'kursus',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'institusi',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'tanggal',
+        type: 'string',
+      },
     ],
     name: 'SertifikatDiterbitkan',
     type: 'event',
@@ -40,116 +53,333 @@ const contractAbi = [
   {
     inputs: [],
     name: 'admin',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-    constant: true,
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    name: 'daftarSertifikat',
     outputs: [
-      { internalType: 'uint256', name: 'id', type: 'uint256' },
-      { internalType: 'address', name: 'penerima', type: 'address' },
-      { internalType: 'string', name: 'nama', type: 'string' },
-      { internalType: 'string', name: 'kursus', type: 'string' },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'daftarSertifikat',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'penerima',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'nama',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'kursus',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'institusi',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'tanggal',
+        type: 'string',
+      },
+      {
+        internalType: 'bool',
+        name: 'valid',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
     name: 'jumlahSertifikat',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
-    constant: true,
   },
   {
     inputs: [
-      { internalType: 'address', name: 'penerima', type: 'address' },
-      { internalType: 'string', name: 'nama', type: 'string' },
-      { internalType: 'string', name: 'kursus', type: 'string' },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'sertifikatByPenerima',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'penerima',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'nama',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'kursus',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'institusi',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'tanggal',
+        type: 'string',
+      },
     ],
     name: 'terbitkanSertifikat',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256',
+      },
+    ],
+    name: 'verifikasiSertifikat',
+    outputs: [
+      {
+        internalType: 'address',
+        name: 'penerima',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'nama',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'kursus',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'institusi',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'tanggal',
+        type: 'string',
+      },
+      {
+        internalType: 'bool',
+        name: 'valid',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'penerima',
+        type: 'address',
+      },
+    ],
+    name: 'cekSertifikatByPenerima',
+    outputs: [
+      {
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];
 
-let blockchainPendidikanContract;
+async function connectWeb3() {
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-// Inisialisasi kontrak setelah Web3 tersedia
-async function initContract() {
-  const web3 = await initWeb3();
-  if (web3) {
-    blockchainPendidikanContract = new web3.eth.Contract(contractAbi, contractAddress);
-    console.log('✅ Contract connected:', blockchainPendidikanContract);
+    contract = new web3.eth.Contract(contractABI, contractAddress);
+    console.log('Connected to contract:', contract);
+  } else {
+    alert('Metamask tidak ditemukan! Silakan install Metamask.');
   }
 }
+// async function connectWeb3() {
+//   if (window.ethereum) {
+//     web3 = new Web3(window.ethereum);
+//     await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-// Fungsi untuk mendapatkan alamat admin
-async function getAdminAddress() {
+//     contract = new web3.eth.Contract(contractABI, contractAddress);
+//     console.log('Connected to contract:', contract);
+
+//     contract.events
+//       .SertifikatDiterbitkan({
+//         fromBlock: 'latest',
+//       })
+//       .on('data', function (event) {
+//         console.log('Event Data:', event); // Log semua data event untuk debugging
+//         console.log('Return Values:', event.returnValues); // Pastikan returnValues ada
+
+//         if (event.returnValues) {
+//           const { id, penerima, nama, kursus, institusi, tanggal } = event.returnValues;
+//           alert(`Sertifikat diterbitkan dengan ID: ${id}`);
+//           showSertifikatBaru(penerima, nama, kursus, institusi, tanggal, event.transactionHash, id);
+//         } else {
+//           console.error('Event returnValues tidak ditemukan!');
+//         }
+//       })
+//       .on('error', function (error) {
+//         console.error('Error catching event:', error);
+//       });
+//   } else {
+//     alert('Metamask tidak ditemukan! Silakan install Metamask.');
+//   }
+// }
+// async function connectWeb3() {
+//   if (window.ethereum) {
+//     // Menghubungkan ke jaringan Sepolia melalui MetaMask
+//     web3 = new Web3(window.ethereum);
+//     await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+//     // Setel jaringan ke Sepolia (gunakan RPC URL Infura atau Alchemy)
+//     const networkId = await web3.eth.net.getId();
+//     if (networkId === 11155111) {
+//       // ID Sepolia testnet
+//       console.log('Connected to Sepolia Testnet');
+//     } else {
+//       alert('Please switch to Sepolia testnet in your wallet.');
+//       return;
+//     }
+
+//     contract = new web3.eth.Contract(contractABI, contractAddress);
+//     console.log('Connected to contract:', contract);
+//   } else {
+//     alert('MetaMask not found! Please install MetaMask.');
+//   }
+// }
+
+// Fungsi untuk menerbitkan sertifikat baru
+document.getElementById('formSertifikat').addEventListener('submit', async function (event) {
+  event.preventDefault();
+
+  const accounts = await web3.eth.getAccounts();
+  const adminAddress = accounts[0];
+
+  const penerima = document.getElementById('penerima').value;
+  const nama = document.getElementById('nama').value;
+  const kursus = document.getElementById('kursus').value;
+  const institusi = document.getElementById('institusi').value;
+  const tanggal = document.getElementById('tanggal').value;
+
   try {
-    if (!blockchainPendidikanContract) {
-      console.error('🚨 Contract belum diinisialisasi!');
-      return;
-    }
-    const adminAddress = await blockchainPendidikanContract.methods.admin().call();
-    console.log('🔹 Admin Address:', adminAddress);
-    document.getElementById('adminAddress').innerText = `Admin: ${adminAddress}`;
+    // Kirim transaksi dengan gas limit dan gas price yang lebih tinggi
+    const transaction = await contract.methods.terbitkanSertifikat(penerima, nama, kursus, institusi, tanggal).send({
+      from: adminAddress,
+      gas: 2000000, // Tentukan gas limit yang lebih tinggi
+      gasPrice: web3.utils.toWei('10', 'gwei'), // Tentukan gas price, bisa disesuaikan
+    });
+
+    alert('Sertifikat berhasil diterbitkan!');
+    const transactionHash = transaction.transactionHash; // Ambil hash transaksi
+    showSertifikatBaru(penerima, nama, kursus, institusi, tanggal, transactionHash);
   } catch (error) {
-    console.error('❌ Error getting admin address:', error);
+    console.error('Gagal menerbitkan sertifikat:', error);
+    alert('Gagal menerbitkan sertifikat.');
   }
+});
+
+// // Fungsi untuk memverifikasi sertifikat berdasarkan ID
+// document.getElementById('formVerifikasi').addEventListener('submit', async function (event) {
+//   event.preventDefault();
+
+//   const sertifikatId = document.getElementById('verifikasi-id').value;
+//   if (!sertifikatId) {
+//     alert('ID sertifikat tidak boleh kosong.');
+//     return;
+//   }
+
+//   try {
+//     const sertifikat = await contract.methods.verifikasiSertifikat(sertifikatId).call();
+
+//     // Tampilkan informasi sertifikat jika valid
+//     document.getElementById('sertifikatInfo').style.display = 'block';
+//     document.getElementById('verifikasi-nama').textContent = sertifikat.nama;
+//     document.getElementById('verifikasi-kursus').textContent = sertifikat.kursus;
+//     document.getElementById('verifikasi-institusi').textContent = sertifikat.institusi;
+//     document.getElementById('verifikasi-tanggal').textContent = sertifikat.tanggal;
+//     document.getElementById('verifikasi-status').textContent = sertifikat.valid ? 'Valid' : 'Tidak Valid';
+//   } catch (error) {
+//     console.error('Gagal verifikasi sertifikat:', error);
+//     alert('Gagal memverifikasi sertifikat.');
+//   }
+// });
+
+// Fungsi untuk menampilkan sertifikat yang baru diterbitkan
+function showSertifikatBaru(penerima, nama, kursus, institusi, tanggal, transactionHash) {
+  const sertifikatBaru = document.getElementById('sertifikatBaru');
+  sertifikatBaru.innerHTML = `
+    <h4>Sertifikat Baru Diterbitkan:</h4>
+    <p><strong>Nama:</strong> ${nama}</p>
+    <p><strong>Kursus:</strong> ${kursus}</p>
+    <p><strong>Institusi:</strong> ${institusi}</p>
+    <p><strong>Tanggal:</strong> ${tanggal}</p>
+    <p><strong>Penerima:</strong> ${penerima}</p>
+    <p><strong>Transaction Hash:</strong> <a href="https://etherscan.io/tx/${transactionHash}" target="_blank">${transactionHash}</a></p>
+  `;
 }
 
-// Fungsi untuk mengajukan permintaan sertifikat
-async function ajukanPermintaanSertifikat() {
-  try {
-    if (!blockchainPendidikanContract) {
-      console.error('🚨 Contract belum diinisialisasi!');
-      return;
-    }
-
-    // Minta akses MetaMask
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const userAddress = accounts[0];
-
-    if (!web3.utils.isAddress(userAddress)) {
-      throw new Error('❌ Alamat Ethereum tidak valid');
-    }
-
-    // Ambil input dari form
-    const nama = document.getElementById('nama').value.trim();
-    const kursus = document.getElementById('kursus').value.trim();
-
-    if (!nama || !kursus) {
-      throw new Error('⚠️ Nama dan Kursus harus diisi!');
-    }
-
-    // Estimasi gas
-    const gasEstimate = await blockchainPendidikanContract.methods.terbitkanSertifikat(userAddress, nama, kursus)
-      .estimateGas({ from: userAddress });
-
-    // Kirim transaksi
-    const result = await blockchainPendidikanContract.methods.terbitkanSertifikat(userAddress, nama, kursus)
-      .send({ from: userAddress, gas: gasEstimate });
-
-    // Tampilkan hasil di HTML
-    document.getElementById('resultMessage').innerText = `✅ Sertifikat berhasil diajukan untuk ${nama} (${kursus}). TX: ${result.transactionHash}`;
-    document.getElementById('certificateResult').style.display = 'block';
-
-    console.log('✔️ Transaksi berhasil:', result);
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    alert(error.message);
-  }
-}
-
-// Panggil fungsi saat halaman dimuat
-window.onload = async () => {
-  await initContract();
-  getAdminAddress(); // Dapatkan admin setelah kontrak terhubung
-};
+window.onload = connectWeb3;
