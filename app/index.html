@@ -28,33 +28,15 @@
         background-color: #007bff;
         border-color: #007bff;
       }
-      .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #004085;
-      }
       .form-control {
         border-radius: 5px;
       }
-      #sertifikatBaru {
+      #sertifikatBaru,
+      #verifikasiHasil {
         background-color: #f1f1f1;
         border-radius: 10px;
         padding: 20px;
         margin-top: 20px;
-      }
-      #sertifikatBaru p {
-        font-size: 1.1rem;
-      }
-      .alert {
-        margin-top: 20px;
-        font-size: 1.2rem;
-      }
-      @media (max-width: 576px) {
-        .container {
-          padding: 20px;
-        }
-        h2 {
-          font-size: 1.5rem;
-        }
       }
     </style>
   </head>
@@ -62,7 +44,7 @@
     <div class="container mt-5">
       <h2>Aplikasi Sertifikat Blockchain</h2>
 
-      <!-- Form untuk memasukkan data sertifikat -->
+      <!-- Form untuk menerbitkan sertifikat -->
       <form id="formSertifikat">
         <div class="form-group">
           <label for="penerima">Penerima:</label>
@@ -86,12 +68,39 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Terbitkan Sertifikat</button>
       </form>
+
+      <div id="hashTransaksi" class="mt-4"></div>
       <hr />
 
-      <!-- Menampilkan sertifikat yang baru diterbitkan -->
-      <div id="sertifikatBaru" class="mt-4"></div>
+      <!-- Form untuk verifikasi sertifikat -->
+      <div class="mt-4">
+        <h3>Verifikasi Sertifikat</h3>
+        <input type="number" id="verifikasiId" class="form-control" placeholder="Masukkan ID Sertifikat" />
+        <button class="btn btn-success btn-block mt-2" onclick="verifikasiSertifikat()">Verifikasi</button>
+      </div>
 
-    <!-- Script untuk menghubungkan Web3 dan interaksi dengan smart contract -->
+      <div id="verifikasiHasil" class="mt-4"></div>
+
+      <!-- Daftar Sertifikat -->
+      <div class="mt-5">
+        <h3>Daftar Sertifikat</h3>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Penerima</th>
+              <th>Nama</th>
+              <th>Kursus</th>
+              <th>Institusi</th>
+              <th>Tanggal</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="daftarSertifikat"></tbody>
+        </table>
+      </div>
+    </div>
+
     <script src="app.js"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 let web3;
 let contract;
-const contractAddress = '0x0d7Be2d770066FBfEb66d679035A403AE85c2F3E'; // Ganti dengan alamat smart contract Anda
+const contractAddress = '0x63fd5C0432E748642F613FC30f7cCEe84DB71171';
 const contractABI = [
   {
     inputs: [],
@@ -62,6 +62,7 @@ const contractABI = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -111,6 +112,7 @@ const contractABI = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [],
@@ -124,6 +126,7 @@ const contractABI = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -148,6 +151,7 @@ const contractABI = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -225,6 +229,7 @@ const contractABI = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
   {
     inputs: [
@@ -244,80 +249,28 @@ const contractABI = [
     ],
     stateMutability: 'view',
     type: 'function',
+    constant: true,
   },
 ];
 
-async function connectWeb3() {
+async function loadWeb3() {
   if (window.ethereum) {
     web3 = new Web3(window.ethereum);
     await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-    contract = new web3.eth.Contract(contractABI, contractAddress);
-    console.log('Connected to contract:', contract);
   } else {
-    alert('Metamask tidak ditemukan! Silakan install Metamask.');
+    alert('Harap instal MetaMask!');
   }
 }
-// async function connectWeb3() {
-//   if (window.ethereum) {
-//     web3 = new Web3(window.ethereum);
-//     await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-//     contract = new web3.eth.Contract(contractABI, contractAddress);
-//     console.log('Connected to contract:', contract);
+async function loadContract() {
+  contract = new web3.eth.Contract(contractABI, contractAddress);
+}
 
-//     contract.events
-//       .SertifikatDiterbitkan({
-//         fromBlock: 'latest',
-//       })
-//       .on('data', function (event) {
-//         console.log('Event Data:', event); // Log semua data event untuk debugging
-//         console.log('Return Values:', event.returnValues); // Pastikan returnValues ada
-
-//         if (event.returnValues) {
-//           const { id, penerima, nama, kursus, institusi, tanggal } = event.returnValues;
-//           alert(`Sertifikat diterbitkan dengan ID: ${id}`);
-//           showSertifikatBaru(penerima, nama, kursus, institusi, tanggal, event.transactionHash, id);
-//         } else {
-//           console.error('Event returnValues tidak ditemukan!');
-//         }
-//       })
-//       .on('error', function (error) {
-//         console.error('Error catching event:', error);
-//       });
-//   } else {
-//     alert('Metamask tidak ditemukan! Silakan install Metamask.');
-//   }
-// }
-// async function connectWeb3() {
-//   if (window.ethereum) {
-//     // Menghubungkan ke jaringan Sepolia melalui MetaMask
-//     web3 = new Web3(window.ethereum);
-//     await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-//     // Setel jaringan ke Sepolia (gunakan RPC URL Infura atau Alchemy)
-//     const networkId = await web3.eth.net.getId();
-//     if (networkId === 11155111) {
-//       // ID Sepolia testnet
-//       console.log('Connected to Sepolia Testnet');
-//     } else {
-//       alert('Please switch to Sepolia testnet in your wallet.');
-//       return;
-//     }
-
-//     contract = new web3.eth.Contract(contractABI, contractAddress);
-//     console.log('Connected to contract:', contract);
-//   } else {
-//     alert('MetaMask not found! Please install MetaMask.');
-//   }
-// }
-
-// Fungsi untuk menerbitkan sertifikat baru
-document.getElementById('formSertifikat').addEventListener('submit', async function (event) {
+async function terbitkanSertifikat(event) {
   event.preventDefault();
 
   const accounts = await web3.eth.getAccounts();
-  const adminAddress = accounts[0];
+  const admin = accounts[0];
 
   const penerima = document.getElementById('penerima').value;
   const nama = document.getElementById('nama').value;
@@ -325,61 +278,60 @@ document.getElementById('formSertifikat').addEventListener('submit', async funct
   const institusi = document.getElementById('institusi').value;
   const tanggal = document.getElementById('tanggal').value;
 
-  try {
-    // Kirim transaksi dengan gas limit dan gas price yang lebih tinggi
-    const transaction = await contract.methods.terbitkanSertifikat(penerima, nama, kursus, institusi, tanggal).send({
-      from: adminAddress,
-      gas: 2000000, // Tentukan gas limit yang lebih tinggi
-      gasPrice: web3.utils.toWei('10', 'gwei'), // Tentukan gas price, bisa disesuaikan
-    });
-
-    alert('Sertifikat berhasil diterbitkan!');
-    const transactionHash = transaction.transactionHash; // Ambil hash transaksi
-    showSertifikatBaru(penerima, nama, kursus, institusi, tanggal, transactionHash);
-  } catch (error) {
-    console.error('Gagal menerbitkan sertifikat:', error);
-    alert('Gagal menerbitkan sertifikat.');
-  }
-});
-
-// // Fungsi untuk memverifikasi sertifikat berdasarkan ID
-// document.getElementById('formVerifikasi').addEventListener('submit', async function (event) {
-//   event.preventDefault();
-
-//   const sertifikatId = document.getElementById('verifikasi-id').value;
-//   if (!sertifikatId) {
-//     alert('ID sertifikat tidak boleh kosong.');
-//     return;
-//   }
-
-//   try {
-//     const sertifikat = await contract.methods.verifikasiSertifikat(sertifikatId).call();
-
-//     // Tampilkan informasi sertifikat jika valid
-//     document.getElementById('sertifikatInfo').style.display = 'block';
-//     document.getElementById('verifikasi-nama').textContent = sertifikat.nama;
-//     document.getElementById('verifikasi-kursus').textContent = sertifikat.kursus;
-//     document.getElementById('verifikasi-institusi').textContent = sertifikat.institusi;
-//     document.getElementById('verifikasi-tanggal').textContent = sertifikat.tanggal;
-//     document.getElementById('verifikasi-status').textContent = sertifikat.valid ? 'Valid' : 'Tidak Valid';
-//   } catch (error) {
-//     console.error('Gagal verifikasi sertifikat:', error);
-//     alert('Gagal memverifikasi sertifikat.');
-//   }
-// });
-
-// Fungsi untuk menampilkan sertifikat yang baru diterbitkan
-function showSertifikatBaru(penerima, nama, kursus, institusi, tanggal, transactionHash) {
-  const sertifikatBaru = document.getElementById('sertifikatBaru');
-  sertifikatBaru.innerHTML = `
-    <h4>Sertifikat Baru Diterbitkan:</h4>
-    <p><strong>Nama:</strong> ${nama}</p>
-    <p><strong>Kursus:</strong> ${kursus}</p>
-    <p><strong>Institusi:</strong> ${institusi}</p>
-    <p><strong>Tanggal:</strong> ${tanggal}</p>
-    <p><strong>Penerima:</strong> ${penerima}</p>
-    <p><strong>Transaction Hash:</strong> <a href="https://etherscan.io/tx/${transactionHash}" target="_blank">${transactionHash}</a></p>
-  `;
+  const receipt = await contract.methods.terbitkanSertifikat(penerima, nama, kursus, institusi, tanggal).send({ from: admin });
+  // Menampilkan hash transaksi di dalam halaman, bukan alert
+  document.getElementById('hashTransaksi').innerText = `Hash Transaksi: ${receipt.transactionHash}`;
+  tampilkanSertifikat();
 }
 
-window.onload = connectWeb3;
+async function tampilkanSertifikat() {
+  const jumlahSertifikat = await contract.methods.jumlahSertifikat().call();
+  const tableBody = document.getElementById('daftarSertifikat');
+  tableBody.innerHTML = '';
+
+  for (let i = 1; i <= jumlahSertifikat; i++) {
+    const cert = await contract.methods.verifikasiSertifikat(i).call();
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${i}</td>
+      <td>${cert.penerima}</td>
+      <td>${cert.nama}</td>
+      <td>${cert.kursus}</td>
+      <td>${cert.institusi}</td>
+      <td>${cert.tanggal}</td>
+      <td>${cert.valid ? 'Valid' : 'Tidak Valid'}</td>
+    `;
+    tableBody.appendChild(row);
+  }
+}
+
+async function verifikasiSertifikat() {
+  const id = document.getElementById('verifikasiId').value;
+  if (!id) {
+    alert('Masukkan ID sertifikat!');
+    return;
+  }
+
+  try {
+    const cert = await contract.methods.verifikasiSertifikat(id).call();
+    document.getElementById('verifikasiHasil').innerHTML = `
+      <p><strong>Penerima:</strong> ${cert.penerima}</p>
+      <p><strong>Nama:</strong> ${cert.nama}</p>
+      <p><strong>Kursus:</strong> ${cert.kursus}</p>
+      <p><strong>Institusi:</strong> ${cert.institusi}</p>
+      <p><strong>Tanggal:</strong> ${cert.tanggal}</p>
+      <p><strong>Status:</strong> ${cert.valid ? 'Valid' : 'Tidak Valid'}</p>
+    `;
+  } catch (error) {
+    alert('Sertifikat tidak ditemukan!');
+  }
+}
+
+document.getElementById('formSertifikat').addEventListener('submit', terbitkanSertifikat);
+
+window.onload = async function () {
+  await loadWeb3();
+  await loadContract();
+  await tampilkanSertifikat();
+};
