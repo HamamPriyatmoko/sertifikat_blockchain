@@ -14,7 +14,7 @@ Aplikasi ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifika
 ![Penerbitan Sertifikat](link_ke_gif_penerbitan.gif)
 
 ### 2️⃣ Verifikasi Sertifikat
-![Verifikasi Sertifikat](link_ke_gif_verifikasi.gif)
+![Verifikasi Sertifikat](images/VerifikasiSertifikat.gif)
 
 ### 3️⃣ Menampilkan Daftar Sertifikat
 ![Daftar Sertifikat](link_ke_gif_daftar.gif)
