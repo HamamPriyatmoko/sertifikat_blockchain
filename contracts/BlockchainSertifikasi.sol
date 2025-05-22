@@ -11,11 +11,12 @@ contract BlockchainSertifikasi {
         string kursus;
         string institusi;
         string tanggal;
-        bool valid; // Status sertifikat
+        bool valid;
     }
 
     mapping(uint => Sertifikat) public daftarSertifikat;
-    mapping(address => uint[]) public sertifikatByPenerima; // Menyimpan sertifikat berdasarkan penerima
+    mapping(address => uint) public sertifikatIdByPenerima; // Simpan ID sertifikat per penerima, 0 berarti belum ada
+    mapping(address => string) public hashByPenerima;       // Simpan satu hash per penerima
 
     uint public jumlahSertifikat;
 
@@ -25,7 +26,8 @@ contract BlockchainSertifikasi {
         string nama,
         string kursus,
         string institusi,
-        string tanggal
+        string tanggal,
+        string dataHash
     );
 
     modifier hanyaAdmin() {
@@ -42,13 +44,19 @@ contract BlockchainSertifikasi {
         string memory nama,
         string memory kursus,
         string memory institusi,
-        string memory tanggal
+        string memory tanggal,
+        string memory dataHash
     ) public hanyaAdmin {
+        require(sertifikatIdByPenerima[penerima] == 0, "Penerima sudah memiliki sertifikat");
+
         uint id = jumlahSertifikat + 1;
         daftarSertifikat[id] = Sertifikat(id, penerima, nama, kursus, institusi, tanggal, true);
-        sertifikatByPenerima[penerima].push(id);
+
+        sertifikatIdByPenerima[penerima] = id;
+        hashByPenerima[penerima] = dataHash;
+
         jumlahSertifikat++;
-        emit SertifikatDiterbitkan(id, penerima, nama, kursus, institusi, tanggal);
+        emit SertifikatDiterbitkan(id, penerima, nama, kursus, institusi, tanggal, dataHash);
     }
 
     function verifikasiSertifikat(uint id) public view returns (
@@ -64,7 +72,11 @@ contract BlockchainSertifikasi {
         return (cert.penerima, cert.nama, cert.kursus, cert.institusi, cert.tanggal, cert.valid);
     }
 
-    function cekSertifikatByPenerima(address penerima) public view returns (uint[] memory) {
-        return sertifikatByPenerima[penerima];
+    function cekSertifikatByPenerima(address penerima) public view returns (uint) {
+        return sertifikatIdByPenerima[penerima];
+    }
+
+    function getHashByPenerima(address penerima) public view returns (string memory) {
+        return hashByPenerima[penerima];
     }
 }
