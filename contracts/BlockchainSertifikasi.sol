@@ -3,31 +3,38 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract BlockchainSertifikasi {
     address public admin;
+    bytes32[] public allIds;
 
     struct Sertifikat {
-        uint id;
-        address penerima;
+        bytes32 id;
         string nama;
-        string kursus;
-        string institusi;
+        string universitas;
+        string jurusan;
+        string sertifikatToefl; 
+        string sertifikatBTA; 
+        string sertifikatSKP;
         string tanggal;
+        string urlCid;
+        uint blockNumber;   // Nomor blok saat diterbitkan
         bool valid;
     }
 
-    mapping(uint => Sertifikat) public daftarSertifikat;
-    mapping(address => uint) public sertifikatIdByPenerima; // Simpan ID sertifikat per penerima, 0 berarti belum ada
-    mapping(address => string) public hashByPenerima;       // Simpan satu hash per penerima
-
-    uint public jumlahSertifikat;
+    mapping(bytes32 => Sertifikat) public daftarSertifikat;
+    mapping(bytes32 => string) public hashById;
+    mapping(bytes32 => bytes32) public idByHash;
 
     event SertifikatDiterbitkan(
-        uint id,
-        address penerima,
+        bytes32 id,
         string nama,
-        string kursus,
-        string institusi,
+        string universitas,
+        string jurusan,
+        string sertifikatToefl,
+        string sertifikatBTA,
+        string sertifikatSKP,
         string tanggal,
-        string dataHash
+        string dataHash,
+        string urlCid,
+        uint blockNumber     // Emit nomor blok
     );
 
     modifier hanyaAdmin() {
@@ -40,43 +47,91 @@ contract BlockchainSertifikasi {
     }
 
     function terbitkanSertifikat(
-        address penerima,
         string memory nama,
-        string memory kursus,
-        string memory institusi,
+        string memory universitas,
+        string memory jurusan,
+        string memory sertifikatToefl,
+        string memory sertifikatBTA,
+        string memory sertifikatSKP,
         string memory tanggal,
-        string memory dataHash
+        string memory dataHash,
+        string memory urlCid
     ) public hanyaAdmin {
-        require(sertifikatIdByPenerima[penerima] == 0, "Penerima sudah memiliki sertifikat");
+        bytes32 hashKey = keccak256(abi.encodePacked(dataHash));
+        require(idByHash[hashKey] == bytes32(0), "Hash sudah digunakan");
 
-        uint id = jumlahSertifikat + 1;
-        daftarSertifikat[id] = Sertifikat(id, penerima, nama, kursus, institusi, tanggal, true);
+        bytes32 id = keccak256(abi.encodePacked(tanggal, block.number, block.timestamp, nama, universitas));
+        require(!daftarSertifikat[id].valid, "Sertifikat sudah ada");
 
-        sertifikatIdByPenerima[penerima] = id;
-        hashByPenerima[penerima] = dataHash;
+        daftarSertifikat[id] = Sertifikat(
+            id,
+            nama,
+            universitas,
+            jurusan,
+            sertifikatToefl,
+            sertifikatBTA,
+            sertifikatSKP,
+            tanggal,
+            urlCid,
+            block.number,    // Simpan nomor blok di struct
+            true
+        );
+        allIds.push(id);
+        hashById[id] = dataHash;
+        idByHash[hashKey] = id;
 
-        jumlahSertifikat++;
-        emit SertifikatDiterbitkan(id, penerima, nama, kursus, institusi, tanggal, dataHash);
+        emit SertifikatDiterbitkan(
+            id,
+            nama,
+            universitas,
+            jurusan,
+            sertifikatToefl,
+            sertifikatBTA,
+            sertifikatSKP,
+            tanggal,
+            dataHash,
+            urlCid,
+            block.number     // Emit nomor blok
+        );
     }
 
-    function verifikasiSertifikat(uint id) public view returns (
-        address penerima,
+    function getAllIds() public view returns (bytes32[] memory) {
+        return allIds;
+    }
+
+    function verifySertifikat(bytes32 id) public view returns (
         string memory nama,
-        string memory kursus,
-        string memory institusi,
+        string memory universitas,
+        string memory jurusan,
+        string memory sertifikatToefl,
+        string memory sertifikatBTA,
+        string memory sertifikatSKP,
         string memory tanggal,
+        string memory urlCid,
+        uint blockNumber,
         bool valid
     ) {
         require(daftarSertifikat[id].valid, "Sertifikat tidak ditemukan atau tidak valid");
         Sertifikat memory cert = daftarSertifikat[id];
-        return (cert.penerima, cert.nama, cert.kursus, cert.institusi, cert.tanggal, cert.valid);
+        return (
+            cert.nama,
+            cert.universitas,
+            cert.jurusan,
+            cert.sertifikatToefl,
+            cert.sertifikatBTA,
+            cert.sertifikatSKP,
+            cert.tanggal,
+            cert.urlCid,
+            cert.blockNumber,    // Kembalikan nomor blok
+            cert.valid
+        );
     }
 
-    function cekSertifikatByPenerima(address penerima) public view returns (uint) {
-        return sertifikatIdByPenerima[penerima];
+    function verifyHash(string memory dataHash) public view returns (bytes32) {
+    return idByHash[keccak256(abi.encodePacked(dataHash))];
     }
-
-    function getHashByPenerima(address penerima) public view returns (string memory) {
-        return hashByPenerima[penerima];
+    function getHashById(bytes32 id) public view returns (string memory) {
+        require(daftarSertifikat[id].valid, "Hash untuk sertifikat tidak ditemukan");
+        return hashById[id];
     }
 }
