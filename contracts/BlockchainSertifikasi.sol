@@ -99,7 +99,7 @@ contract BlockchainSertifikasi {
         return allIds;
     }
 
-    function verifySertifikat(bytes32 id) public view returns (
+    function getSertifikat(bytes32 id) public view returns (
         string memory nama,
         string memory universitas,
         string memory jurusan,
