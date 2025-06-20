@@ -62,7 +62,6 @@ contract BlockchainSertifikasi {
         requiredApprovals = _requiredApprovals;
     }
     
-    // --- FUNGSI BARU UNTUK MANAJEMEN APPROVER ---
 
     /**
      * @dev Menambahkan alamat baru sebagai approver. Hanya bisa dipanggil oleh admin.
