@@ -90,8 +90,8 @@ contract BlockchainSertifikasi {
     }
 
     // Tambahkan fungsi ini di dalam contract BlockchainSertifikasi
-    function getSertifikatCount() public view returns (uint256) {
-        return allIds.length;
+    function getAllId() public view returns (bytes32[] memory) {
+        return allIds;
     }
 
     function getSertifikatById(bytes32 id) public view returns (Sertifikat memory) { 
