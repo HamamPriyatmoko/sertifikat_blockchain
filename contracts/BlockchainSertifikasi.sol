@@ -89,6 +89,11 @@ contract BlockchainSertifikasi {
         emit SertifikatDiterbitkan(id, _input.nim, _input.nama, _input.tanggalTerbit, _input.hashMetadata);
     }
 
+    // Tambahkan fungsi ini di dalam contract BlockchainSertifikasi
+    function getSertifikatCount() public view returns (uint256) {
+        return allIds.length;
+    }
+
     function getSertifikatById(bytes32 id) public view returns (Sertifikat memory) { 
         require(daftarSertifikat[id].valid, "Sertifikat tidak ditemukan.");
         return daftarSertifikat[id];
