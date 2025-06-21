@@ -11,13 +11,13 @@ Aplikasi ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifika
 ## 🎥 Tutorial Penggunaan
 
 ### 1️⃣ Penerbitan Sertifikat
-![Penerbitan Sertifikat](link_ke_gif_penerbitan.gif)
+![Penerbitan Sertifikat](images/TerbitkanSertifikat.gif)
 
 ### 2️⃣ Verifikasi Sertifikat
-![Verifikasi Sertifikat](link_ke_gif_verifikasi.gif)
+![Verifikasi Sertifikat](images/VerifikasiSertifikat.gif)
 
 ### 3️⃣ Menampilkan Daftar Sertifikat
-![Daftar Sertifikat](link_ke_gif_daftar.gif)
+![Daftar Sertifikat](images/DaftarSertifikat.png)
 
 ## ⚙️ Teknologi yang Digunakan
 - **Solidity**: Smart contract
