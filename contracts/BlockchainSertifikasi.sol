@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
 contract BlockchainSertifikasi { 
@@ -7,100 +6,95 @@ contract BlockchainSertifikasi {
 
     struct SertifikatInput {
         string nim;
-        string nama;
         string universitas;
-        string jurusan;
-        string tanggalTerbit;
+        string cidDetail;
         string hashMetadata;
-        string cidSuratBebasPerpustakaan;
-        string cidSuratBebasLaboratorium;
-        string cidSuratBebasKeuangan;
-        string cidBuktiPenyerahanSkripsi;
-        string cidSertifikatToefl;
+        string nomerSertifikat;
     }
 
     struct Sertifikat {
         bytes32 id;
         string nim;
-        string nama;
         string universitas;
-        string jurusan;
-        string tanggalTerbit;
-        string hashMetadata; // <-- DIUBAH MENJADI STRING
-        string cidSuratBebasPerpustakaan;
-        string cidSuratBebasLaboratorium;
-        string cidSuratBebasKeuangan;
-        string cidBuktiPenyerahanSkripsi;
-        string cidSertifikatToefl;
+        string cidDetail;
+        string hashMetadata;
+        string nomerSertifikat;
         uint blockNumber;
-        bool valid;
     }
 
     mapping(bytes32 => Sertifikat) public daftarSertifikat;
-    mapping(string => bytes32) internal idByNIM;
-    // Kunci mapping diubah menjadi string karena hashMetadata sekarang string
-    mapping(string => bytes32) public idByHashMetadata; // <-- DIUBAH MENJADI STRING KEY
+    mapping(string => bytes32) public idByNIM;
+    mapping(string => bytes32) public idByHashMetadata;
 
     event SertifikatDiterbitkan(
         bytes32 id,
         string nim,
-        string nama,
-        string tanggalTerbit,
-        string hashMetadata // <-- DIUBAH MENJADI STRING
+        string universitas,
+        string cidDetail,
+        string nomerSertifikat,
+        string hashMetadata
     );
 
     modifier hanyaAdmin() {
         require(msg.sender == admin, "Hanya admin yang dapat menjalankan fungsi ini");
-        _;
+        _; 
     }
 
     constructor() {
         admin = msg.sender;
     }
 
+    function ubahAdmin(address _adminBaru) public hanyaAdmin {
+        admin = _adminBaru;
+    }
+
     function terbitkanSertifikat(SertifikatInput memory _input) public hanyaAdmin {
+        // Cek apakah NIM sudah terdaftar
         require(idByNIM[_input.nim] == bytes32(0), "Sertifikat untuk NIM ini sudah ada.");
-        // Pengecekan keunikan hash menggunakan string key
-        require(idByHashMetadata[_input.hashMetadata] == bytes32(0), "Metadata sertifikat ini sudah terdaftar.");
+        
+        // Validasi CID detail tidak kosong
+        require(bytes(_input.cidDetail).length > 0, "CID tidak valid");
 
-        bytes32 id = keccak256(abi.encodePacked(block.timestamp, _input.nim, _input.nama));
+        // Buat ID unik berdasarkan NIM dan nomor sertifikat
+        bytes32 id = keccak256(abi.encodePacked(block.timestamp, _input.nim, _input.nomerSertifikat));
 
+        // Simpan sertifikat
         daftarSertifikat[id] = Sertifikat(
             id,
             _input.nim,
-            _input.nama,
             _input.universitas,
-            _input.jurusan,
-            _input.tanggalTerbit,
-            _input.hashMetadata, // Disimpan sebagai string
-            _input.cidSuratBebasPerpustakaan,
-            _input.cidSuratBebasLaboratorium,
-            _input.cidSuratBebasKeuangan,
-            _input.cidBuktiPenyerahanSkripsi,
-            _input.cidSertifikatToefl,
-            block.number,
-            true
+            _input.cidDetail,
+            _input.hashMetadata,
+            _input.nomerSertifikat,
+            block.number
         );
         
         allIds.push(id);
         idByNIM[_input.nim] = id;
         idByHashMetadata[_input.hashMetadata] = id;
 
-        emit SertifikatDiterbitkan(id, _input.nim, _input.nama, _input.tanggalTerbit, _input.hashMetadata);
+        // Emit event
+        emit SertifikatDiterbitkan(
+            id, 
+            _input.nim, 
+            _input.universitas, 
+            _input.cidDetail, 
+            _input.nomerSertifikat, 
+            _input.hashMetadata
+        );
     }
 
-    // Tambahkan fungsi ini di dalam contract BlockchainSertifikasi
     function getAllId() public view returns (bytes32[] memory) {
         return allIds;
     }
 
     function getSertifikatById(bytes32 id) public view returns (Sertifikat memory) { 
-        require(daftarSertifikat[id].valid, "Sertifikat tidak ditemukan.");
+        // Validasi ID
+        require(daftarSertifikat[id].id != bytes32(0), "Sertifikat tidak ditemukan.");
         return daftarSertifikat[id];
     }
 
-    // Fungsi ini sekarang menerima string sebagai parameter
-    function getSertifikatByHash(string memory _hashMetadata) public view returns (Sertifikat memory) { // <-- DIUBAH MENJADI STRING
+    function getSertifikatByHash(string memory _hashMetadata) public view returns (Sertifikat memory) {
         bytes32 id = idByHashMetadata[_hashMetadata];
         require(id != bytes32(0), "Sertifikat dengan hash metadata ini tidak ditemukan.");
         return daftarSertifikat[id];
