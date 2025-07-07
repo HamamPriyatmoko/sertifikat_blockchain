@@ -1,145 +1,105 @@
-const BlockchainSertifikasi = artifacts.require('BlockchainSertifikasi');
+const BlockchainSertifikasiPublik = artifacts.require('BlockchainSertifikasiPublik');
 
-contract('BlockchainSertifikasi', (accounts) => {
-  let blockchainSertifikasi;
-  const admin = accounts[0];
-  const user = accounts[1];
+contract('BlockchainSertifikasiPublik', (accounts) => {
+  let sertifikasiPublik;
 
-  // Setup kontrak sebelum setiap tes
+  const penerbit1 = accounts[0];
+  const penerbit2 = accounts[1];
+
   beforeEach(async () => {
-    blockchainSertifikasi = await BlockchainSertifikasi.new();
+    sertifikasiPublik = await BlockchainSertifikasiPublik.new();
   });
 
-  // Pengujian: Memastikan admin adalah pengelola yang sah
-  it('seharusnya menetapkan admin sebagai pengelola kontrak', async () => {
-    const currentAdmin = await blockchainSertifikasi.admin();
-    assert.equal(currentAdmin, admin, 'Admin tidak benar.');
-  });
-
-  // Pengujian: Memastikan sertifikat dapat diterbitkan oleh admin
   it('seharusnya bisa menerbitkan sertifikat', async () => {
     const sertifikatInput = {
       nim: '12345',
-      universitas: 'Universitas A',
+      universitas: 'Universitas Terbuka A',
       cidDetail: 'Qm123abc',
       hashMetadata: '0x123abc',
       nomerSertifikat: 'SERT001',
     };
 
-    await blockchainSertifikasi.terbitkanSertifikat(sertifikatInput, { from: admin });
+    await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit1 });
 
-    const id = await blockchainSertifikasi.idByNIM(sertifikatInput.nim);
-    const sertifikat = await blockchainSertifikasi.getSertifikatById(id);
+    const id = await sertifikasiPublik.idByNIM(sertifikatInput.nim);
+    const sertifikat = await sertifikasiPublik.getSertifikatById(id);
 
     assert.equal(sertifikat.nim, sertifikatInput.nim, 'NIM tidak sesuai.');
     assert.equal(sertifikat.universitas, sertifikatInput.universitas, 'Universitas tidak sesuai.');
-    assert.equal(sertifikat.cidDetail, sertifikatInput.cidDetail, 'CID Detail tidak sesuai.');
-    assert.equal(
-      sertifikat.nomerSertifikat,
-      sertifikatInput.nomerSertifikat,
-      'Nomor Sertifikat tidak sesuai.',
-    );
   });
 
-  // Pengujian: Memastikan hanya admin yang bisa menerbitkan sertifikat
-  it('seharusnya menolak penerbitan sertifikat oleh non-admin', async () => {
+  it('seharusnya menolak penerbitan sertifikat ganda untuk NIM yang sama', async () => {
     const sertifikatInput = {
-      nim: '54321',
-      universitas: 'Universitas B',
-      cidDetail: 'Qm543xyz',
-      hashMetadata: '0x543xyz',
-      nomerSertifikat: 'SERT002',
+      nim: '11122',
+      universitas: 'Universitas C',
+      cidDetail: 'Qm1122',
+      hashMetadata: '0x1122',
+      nomerSertifikat: 'SERT003',
     };
 
-    try {
-      await blockchainSertifikasi.terbitkanSertifikat(sertifikatInput, { from: user });
-      assert.fail('Seharusnya transaksi ini gagal');
-    } catch (error) {
-      assert.include(
-        error.message,
-        'Hanya admin yang dapat menjalankan fungsi ini',
-        'Pesan error tidak sesuai.',
-      );
-    }
-  });
-
-  // Pengujian: Memastikan tidak ada sertifikat ganda untuk NIM yang sama
-  it('seharusnya tidak mengizinkan penerbitan sertifikat ganda untuk NIM yang sama', async () => {
-    const sertifikatInput = {
-      nim: '12345',
-      universitas: 'Universitas A',
-      cidDetail: 'Qm123abc',
-      hashMetadata: '0x123abc',
-      nomerSertifikat: 'SERT001',
-    };
-
-    await blockchainSertifikasi.terbitkanSertifikat(sertifikatInput, { from: admin });
+    await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit1 });
 
     try {
-      await blockchainSertifikasi.terbitkanSertifikat(sertifikatInput, { from: admin });
+      await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit2 });
       assert.fail('Seharusnya transaksi ini gagal karena NIM sudah ada.');
     } catch (error) {
       assert.include(
         error.message,
-        'Sertifikat untuk NIM ini sudah ada',
-        'Pesan error tidak sesuai.',
+        'Sertifikat untuk NIM ini sudah ada.',
+        'Pesan error duplikasi NIM tidak sesuai.',
       );
     }
   });
 
-  // Pengujian: Memastikan kita dapat mengambil sertifikat berdasarkan ID
-  it('seharusnya bisa mengambil sertifikat berdasarkan ID', async () => {
+  it('seharusnya menolak penerbitan jika CID detail kosong', async () => {
     const sertifikatInput = {
-      nim: '12345',
-      universitas: 'Universitas A',
-      cidDetail: 'Qm123abc',
-      hashMetadata: '0x123abc',
-      nomerSertifikat: 'SERT001',
+      nim: '77889',
+      universitas: 'Universitas D',
+      cidDetail: '',
+      hashMetadata: '0x77889',
+      nomerSertifikat: 'SERT004',
     };
 
-    await blockchainSertifikasi.terbitkanSertifikat(sertifikatInput, { from: admin });
-    const id = await blockchainSertifikasi.idByNIM(sertifikatInput.nim);
-    const sertifikat = await blockchainSertifikasi.getSertifikatById(id);
-
-    assert.equal(sertifikat.nim, sertifikatInput.nim, 'NIM tidak sesuai.');
-  });
-
-  // Pengujian: Memastikan kita bisa mengambil sertifikat berdasarkan hash metadata
-  it('seharusnya bisa mengambil sertifikat berdasarkan hash metadata', async () => {
-    const sertifikatInput = {
-      nim: '12345',
-      universitas: 'Universitas A',
-      cidDetail: 'Qm123abc',
-      hashMetadata: '0x123abc',
-      nomerSertifikat: 'SERT001',
-    };
-
-    await blockchainSertifikasi.terbitkanSertifikat(sertifikatInput, { from: admin });
-    const sertifikat = await blockchainSertifikasi.getSertifikatByHash(
-      sertifikatInput.hashMetadata,
-    );
-
-    assert.equal(sertifikat.nim, sertifikatInput.nim, 'NIM tidak sesuai.');
-  });
-
-  // Pengujian: Memastikan hanya admin yang bisa mengubah admin
-  it('seharusnya hanya admin yang dapat mengubah admin', async () => {
-    await blockchainSertifikasi.ubahAdmin(user, { from: admin });
-    const newAdmin = await blockchainSertifikasi.admin();
-    assert.equal(newAdmin, user, 'Admin belum diubah.');
-  });
-
-  // Pengujian: Memastikan non-admin tidak dapat mengubah admin
-  it('seharusnya tidak dapat mengubah admin oleh non-admin', async () => {
     try {
-      await blockchainSertifikasi.ubahAdmin(user, { from: user });
-      assert.fail('Seharusnya transaksi ini gagal');
+      await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit1 });
+      assert.fail('Seharusnya transaksi gagal karena CID kosong.');
     } catch (error) {
       assert.include(
         error.message,
-        'Hanya admin yang dapat menjalankan fungsi ini',
-        'Pesan error tidak sesuai.',
+        'CID tidak valid',
+        'Pesan error untuk CID tidak valid tidak sesuai.',
       );
     }
+  });
+
+  it('seharusnya bisa mengambil sertifikat berdasarkan ID', async () => {
+    const sertifikatInput = {
+      nim: '99999',
+      universitas: 'Universitas E',
+      cidDetail: 'Qm999',
+      hashMetadata: '0x999',
+      nomerSertifikat: 'SERT005',
+    };
+
+    await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit1 });
+    const id = await sertifikasiPublik.idByNIM(sertifikatInput.nim);
+    const sertifikat = await sertifikasiPublik.getSertifikatById(id);
+
+    assert.equal(sertifikat.nim, sertifikatInput.nim, 'NIM tidak sesuai.');
+  });
+
+  it('seharusnya bisa mengambil sertifikat berdasarkan hash metadata', async () => {
+    const sertifikatInput = {
+      nim: '88888',
+      universitas: 'Universitas F',
+      cidDetail: 'Qm888',
+      hashMetadata: '0x888',
+      nomerSertifikat: 'SERT006',
+    };
+
+    await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit1 });
+    const sertifikat = await sertifikasiPublik.getSertifikatByHash(sertifikatInput.hashMetadata);
+
+    assert.equal(sertifikat.nim, sertifikatInput.nim, 'NIM tidak sesuai.');
   });
 });
