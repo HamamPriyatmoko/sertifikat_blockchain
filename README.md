@@ -5,24 +5,20 @@ Aplikasi ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifika
 
 ## 🚀 Fitur Aplikasi
 - **Penerbitan Sertifikat**: Admin dapat menerbitkan sertifikat baru dengan memasukkan data penerima.
-- **Verifikasi Sertifikat**: Pengguna dapat memverifikasi sertifikat berdasarkan ID.
+- **Verifikasi Sertifikat**: Pengguna dapat memverifikasi sertifikat berdasarkan Hash.
 - **Daftar Sertifikat**: Menampilkan semua sertifikat yang telah diterbitkan.
 
 ## 🎥 Tutorial Penggunaan
 
 ### 1️⃣ Penerbitan Sertifikat
-![Penerbitan Sertifikat](images/TerbitkanSertifikat.gif)
 
 ### 2️⃣ Verifikasi Sertifikat
-![Verifikasi Sertifikat](images/VerifikasiSertifikat.gif)
 
 ### 3️⃣ Menampilkan Daftar Sertifikat
-![Daftar Sertifikat](images/DaftarSertifikat.png)
 
 ## ⚙️ Teknologi yang Digunakan
 - **Solidity**: Smart contract
-- **Web3.js**: Integrasi dengan blockchain
-- **Bootstrap**: UI styling
+- **Ganache**: Jaringan Development
 - **MetaMask**: Wallet Ethereum
 
 ## 📥 Instalasi & Penggunaan
@@ -32,8 +28,6 @@ Aplikasi ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifika
    ```
 2. Jalankan server dan pastikan memiliki MetaMask terhubung.
 3. Deploy smart contract di jaringan blockchain.
-4. Jalankan aplikasi dengan membuka file `index.html`.
-
 ---
 
 📧 **Kontak Developer**
