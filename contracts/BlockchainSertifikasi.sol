@@ -21,6 +21,7 @@ contract BlockchainSertifikasiPublik {
         string hashMetadata;
         string nomerSertifikat;
         uint blockNumber;
+        uint timestamp;
     }
 
     mapping(bytes32 => Sertifikat) public daftarSertifikat;
@@ -33,7 +34,9 @@ contract BlockchainSertifikasiPublik {
         string universitas,
         string cidDetail,
         string nomerSertifikat,
-        string hashMetadata
+        string hashMetadata,
+        uint blockNumber,
+        uint timestamp
     );
 
     function terbitkanSertifikat(SertifikatInput memory _input) public {
@@ -41,6 +44,7 @@ contract BlockchainSertifikasiPublik {
         require(bytes(_input.cidDetail).length > 0, "CID tidak valid");
 
         bytes32 id = keccak256(abi.encodePacked(block.timestamp, msg.sender, _input.nim, _input.nomerSertifikat));
+        uint WaktuTerbit = block.timestamp;
 
         daftarSertifikat[id] = Sertifikat(
             id,
@@ -49,7 +53,8 @@ contract BlockchainSertifikasiPublik {
             _input.cidDetail,
             _input.hashMetadata,
             _input.nomerSertifikat,
-            block.number
+            block.number,
+            WaktuTerbit
         );
         
         allIds.push(id);
@@ -62,7 +67,9 @@ contract BlockchainSertifikasiPublik {
             _input.universitas, 
             _input.cidDetail, 
             _input.nomerSertifikat, 
-            _input.hashMetadata
+            _input.hashMetadata,
+            block.number,
+            WaktuTerbit
         );
     }
 

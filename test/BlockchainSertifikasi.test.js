@@ -98,7 +98,7 @@ contract('BlockchainSertifikasiPublik', (accounts) => {
     };
 
     await sertifikasiPublik.terbitkanSertifikat(sertifikatInput, { from: penerbit1 });
-    const sertifikat = await sertifikasiPublik.getSertifikatByHash(sertifikatInput.hashMetadata);
+    const sertifikat = await sertifikasiPublik.findSertifikatHash(sertifikatInput.hashMetadata);
 
     assert.equal(sertifikat.nim, sertifikatInput.nim, 'NIM tidak sesuai.');
   });

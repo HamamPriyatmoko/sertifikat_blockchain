@@ -1,14 +1,14 @@
-const BlockchainSertifikasi = artifacts.require('BlockchainSertifikasi');
+const BlockchainSertifikasiPublik = artifacts.require('BlockchainSertifikasiPublik');
 
-contract('BlockchainSertifikasi - Gas Usage Tests', (accounts) => {
+contract('BlockchainSertifikasiPublik - Gas Usage Tests', (accounts) => {
   let contract;
   const admin = accounts[0];
 
   beforeEach(async () => {
-    contract = await BlockchainSertifikasi.new({ from: admin });
+    contract = await BlockchainSertifikasiPublik.new({ from: admin });
   });
 
-  it('mengukur gas fee saat menerbitkan sertifikat', async () => {
+  it('mengukur gas yang digunakan saat menerbitkan sertifikat', async () => {
     const input = {
       nim: '001',
       universitas: 'Universitas Indonesia',
@@ -18,10 +18,14 @@ contract('BlockchainSertifikasi - Gas Usage Tests', (accounts) => {
     };
 
     const tx = await contract.terbitkanSertifikat(input, { from: admin });
-    console.log("Gas digunakan untuk terbitkanSertifikat:", tx.receipt.gasUsed);
+    console.log('Gas digunakan untuk terbitkanSertifikat:', tx.receipt.gasUsed);
+
+    const gasPrice = await web3.eth.getGasPrice();
+    const costInWei = web3.utils.toBN(tx.receipt.gasUsed).mul(web3.utils.toBN(gasPrice));
+    console.log('Estimasi biaya dalam Ether:', web3.utils.fromWei(costInWei, 'ether'));
   });
 
-  it('mengukur gas fee saat memanggil getSertifikatById', async () => {
+  it('mengestimasi gas saat memanggil getSertifikatById', async () => {
     const input = {
       nim: '002',
       universitas: 'Universitas Gadjah Mada',
@@ -33,11 +37,11 @@ contract('BlockchainSertifikasi - Gas Usage Tests', (accounts) => {
     await contract.terbitkanSertifikat(input, { from: admin });
     const id = await contract.idByNIM(input.nim);
 
-    const tx = await contract.getSertifikatById.estimateGas(id, { from: admin });
-    console.log("Estimasi gas getSertifikatById:", tx);
+    const estimatedGas = await contract.getSertifikatById.estimateGas(id, { from: admin });
+    console.log('Estimasi gas untuk getSertifikatById:', estimatedGas);
   });
 
-  it('mengukur gas fee saat memanggil getSertifikatByHash', async () => {
+  it('mengestimasi gas saat memanggil findSertifikatHash', async () => {
     const input = {
       nim: '003',
       universitas: 'ITB',
@@ -47,8 +51,9 @@ contract('BlockchainSertifikasi - Gas Usage Tests', (accounts) => {
     };
 
     await contract.terbitkanSertifikat(input, { from: admin });
-    const tx = await contract.getSertifikatByHash.estimateGas(input.hashMetadata, { from: admin });
-    console.log("Estimasi gas getSertifikatByHash:", tx);
+    const estimatedGas = await contract.findSertifikatHash.estimateGas(input.hashMetadata, {
+      from: admin,
+    });
+    console.log('Estimasi gas untuk findSertifikatHash:', estimatedGas);
   });
-
 });
