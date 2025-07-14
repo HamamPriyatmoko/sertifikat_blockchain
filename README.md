@@ -1,7 +1,7 @@
-# 📜 Aplikasi Sertifikat Blockchain
+# 📜 Web Sertifikat Blockchain
 
-## 📌 Tentang Aplikasi
-Aplikasi ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifikat berbasis blockchain. Dengan memanfaatkan teknologi smart contract, setiap sertifikat yang diterbitkan akan tersimpan di blockchain, memastikan keaslian dan keamanan data.
+## 📌 Tentang Website
+Website ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifikat berbasis blockchain. Dengan memanfaatkan teknologi smart contract, setiap sertifikat yang diterbitkan akan tersimpan di blockchain, memastikan keaslian dan keamanan data.
 
 ## 🚀 Fitur Aplikasi
 - **Penerbitan Sertifikat**: Admin dapat menerbitkan sertifikat baru dengan memasukkan data penerima.
