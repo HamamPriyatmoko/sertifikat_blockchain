@@ -1,35 +1,74 @@
-# 📜 Web Sertifikat Blockchain
+# Web Verifikasi Sertifikat Akademik
 
-## 📌 Tentang Website
-Website ini memungkinkan pengguna untuk menerbitkan dan memverifikasi sertifikat berbasis blockchain. Dengan memanfaatkan teknologi smart contract, setiap sertifikat yang diterbitkan akan tersimpan di blockchain, memastikan keaslian dan keamanan data.
+## Disusun oleh
+- **Nama Mahasiswa**: Hamam Priyatmoko
+- **NIM**: 20210140077
 
-## 🚀 Fitur Aplikasi
-- **Penerbitan Sertifikat**: Admin dapat menerbitkan sertifikat baru dengan memasukkan data penerima.
-- **Verifikasi Sertifikat**: Pengguna dapat memverifikasi sertifikat berdasarkan Hash.
-- **Daftar Sertifikat**: Menampilkan semua sertifikat yang telah diterbitkan.
+## Dosen Pembimbing
+- **Ir. Eko Prasetyo, M.Eng., Ph.D.** (NIDN: 0522046701)
+- **Prayitno, S.ST., M.T., Ph.D.** (NIDN: 0010048506)  
+- **Cahya Damarjati, S.T., M.Eng., Ph.D.** (NIDN: 0515038702)
 
-## 🎥 Tutorial Penggunaan
+## Deskripsi Proyek
+Frontend ini merupakan bagian dari sistem **Verifikasi Sertifikat Akademik berbasis Blockchain**.  
+Aplikasi dibangun menggunakan **React** sebagai antarmuka pengguna (UI) yang memungkinkan admin dan publik untuk melakukan penerbitan serta verifikasi sertifikat.  
 
-### 1️⃣ Penerbitan Sertifikat
+Frontend berfungsi sebagai jembatan interaktif antara **pengguna**, **Backend API (Flask)**, dan **Smart Contract (Ethereum via MetaMask)**.
 
-### 2️⃣ Verifikasi Sertifikat
+## Fitur Utama
+- **Admin Panel**
+  - Login, Registrasi, Reset Password
+  - Penerbitan Sertifikat (unggah file, input data mahasiswa)
+  - Manajemen & Daftar Sertifikat
+  - Unduh PDF Sertifikat + QR Code
 
-### 3️⃣ Menampilkan Daftar Sertifikat
+- **Verifikasi Publik**
+  - Verifikasi dengan **Input Hash**
+  - Verifikasi dengan **Upload PDF**
+  - Verifikasi dengan **Scan QR Code**
+  - Tampilan detail sertifikat + data blockchain
 
-## ⚙️ Teknologi yang Digunakan
-- **Solidity**: Smart contract
-- **Ganache**: Jaringan Development
-- **MetaMask**: Wallet Ethereum
+## Teknologi yang Digunakan
+- **React.js** (Frontend Framework)
+- **MetaMask** (Integrasi Blockchain Ethereum)
+- **Web3.js** (Interaksi dengan Smart Contract)
+- **Fetch API** (Komunikasi ke Backend Flask API)
+- **CSS** (UI Styling)
+- **React Router** (Navigasi antar halaman)
+- **QR Code Scanner Library** (Verifikasi berbasis QR)
 
-## 📥 Instalasi & Penggunaan
-1. Clone repository ini:
-   ```sh
-   git clone https://github.com/HamamPriyatmoko/sertifikat_blockchain.git
+## Persyaratan Sistem
+- Node.js (versi 16+ direkomendasikan)
+- npm atau yarn (package manager)
+- Browser dengan **MetaMask Extension**
+- Koneksi ke Backend API (Flask) dan jaringan Blockchain (Ganache/Testnet/Mainnet)
+
+## Panduan Instalasi dan Menjalankan Proyek
+
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/username/web-verifikasi-sertifikat.git
+   cd web-verifikasi-sertifikat
    ```
-2. Jalankan server dan pastikan memiliki MetaMask terhubung.
-3. Deploy smart contract di jaringan blockchain.
----
-
-📧 **Kontak Developer**
-Jika ada pertanyaan atau ingin berkontribusi, silakan hubungi [hamampriyatmoko81@gmail.com](mailto:hamampriyatmoko81@gmail.com).
-
+2. **Install Dependencies**
+   ```bash
+   npm install
+   # atau
+   yarn install
+   ```
+4. **Konfigurasi Environment**
+   ```bash
+   VITE_CONTRACT_ADDRESS=contractAddressAnda
+   VITE_IPFS_GATEWAY=https://gateway.pinata.cloud/ipfs
+   VITE_VERIFY_BASE_URL=http://localhost:5173/verify
+   VITE_RPC_URL=http://localhost:7545
+   VITE_API_BASE=http://localhost:5000
+   ```
+6. **Jalankan Aplikasi**
+   ```bash
+   npm run dev
+   ```
+8. **Build untuk Production**
+   ```bash
+   npm run build
+   ```
